@@ -1,0 +1,249 @@
+version: "4.1"
+name: GPT
+type: ARM
+deviceName: R7FA6M5BG
+packDir: .pack/Renesas/RA_DFP.6.2.0
+srcDirs: []
+virtualFolder:
+  name: <virtual_root>
+  files: []
+  folders:
+    - name: Source Group 1
+      files: []
+      folders: []
+    - name: :Renesas RA Smart Configurator:Common Sources
+      files:
+        - path: src/hal_entry.c
+        - path: src/hal_warmstart.c
+        - path: src/tempCodeRunnerFile.c
+      folders: []
+    - name: Hardware
+      files:
+        - path: Hardware/UART.c
+        - path: Hardware/UART.h
+        - path: Hardware/SysTick.c
+        - path: Hardware/SysTick.h
+        - path: Hardware/SPI.c
+        - path: Hardware/SPI.h
+        - path: Hardware/GPT.c
+        - path: Hardware/GPT.h
+        - path: Hardware/Hardware_IIC.c
+        - path: Hardware/Hardware_IIC.h
+        - path: Hardware/Encoder.h
+        - path: Hardware/Encoder.c
+        - path: Hardware/Wheel_control.c
+        - path: Hardware/Wheel_control.h
+        - path: Hardware/Key.c
+        - path: Hardware/Key.h
+        - path: Hardware/ADC.c
+        - path: Hardware/ADC.h
+        - path: Hardware/steering_command.c
+        - path: Hardware/steering_command.h
+        - path: Hardware/menu.c
+        - path: Hardware/menu.h
+        - path: Hardware/Navigation.c
+        - path: Hardware/Navigation.h
+        - path: Hardware/Calibration.c
+        - path: Hardware/Calibration.h
+        - path: Hardware/Mechanical_hand_control.c
+        - path: Hardware/Mechanical_hand_control.h
+        - path: Hardware/Robot_Control.c
+        - path: Hardware/Robot_Control.h
+        - path: Hardware/software_iic.c
+        - path: Hardware/software_iic.h
+        - path: Hardware/Vision_Uart9_Comm.c
+        - path: Hardware/Vision_Uart9_Comm.h
+      folders: []
+    - name: LCD
+      files:
+        - path: Hardware/LCD/lcd.c
+        - path: Hardware/LCD/lcd.h
+        - path: Hardware/LCD/lcd_init.c
+        - path: Hardware/LCD/lcd_init.h
+        - path: Hardware/LCD/lcdfont.h
+        - path: Hardware/LCD/pic.h
+      folders: []
+    - name: ::Flex Software
+      files: []
+      folders: []
+dependenceList: []
+outDir: build
+miscInfo:
+  uid: 7e44c2d426e06ade5ef399d52dbdc5d0
+targets:
+  Target_1:
+    cppPreprocessAttrs:
+      defineList: []
+      incList:
+        - Hardware
+        - Hardware/LCD
+        - .
+        - .cmsis/include
+        - RTE/_Target_1
+        - ra_gen
+        - ra_cfg
+        - ra
+        - ra/fsp/inc/api
+        - ra/fsp/inc/instances
+        - ra/fsp
+        - ra/fsp/inc
+        - ra_cfg/fsp_cfg/bsp
+        - ra_cfg/fsp_cfg
+      libList: []
+    excludeList: []
+    toolchain: AC6
+    toolchainConfigMap:
+      AC5:
+        archExtensions: ""
+        cpuType: Cortex-M3
+        floatingPointHardware: none
+        options: ""
+        scatterFilePath: <YOUR_SCATTER_FILE>.sct
+        storageLayout:
+          RAM:
+            - id: 1
+              isChecked: true
+              mem:
+                size: "0x5000"
+                startAddr: "0x20000000"
+              noInit: false
+              tag: IRAM
+          ROM:
+            - id: 1
+              isChecked: true
+              isStartup: true
+              mem:
+                size: "0x10000"
+                startAddr: "0x08000000"
+              tag: IROM
+        useCustomScatterFile: false
+      AC6:
+        archExtensions: ""
+        cpuType: Cortex-M33
+        floatingPointHardware: single
+        options:
+          version: 3
+          afterBuildTasks:
+            - name: "[Copy linker output for Keil User Commands]"
+              abortAfterFailed: true
+              command: mkdir ${KEIL_OUTPUT_DIR} & copy "${OutDir}\${ProjectName}.axf" "${KEIL_OUTPUT_DIR}\${KEIL_OUTPUT_NAME}.axf"
+              disable: false
+            - name: cmd /c ""$Prasc_launcher.bat" "$Prasc_version.txt" -nosplash --launcher.suppressErrors --gensmartbundle --compiler ARMv6 --devicefamily ra "$Pconfiguration.xml" "$L%L" 2> "%%TEMP%%\rasc_stderr.out""
+              abortAfterFailed: true
+              command: cmd /c ""$Prasc_launcher.bat" "$Prasc_version.txt" -nosplash --launcher.suppressErrors --gensmartbundle --compiler ARMv6 --devicefamily ra "$Pconfiguration.xml" "${KEIL_OUTPUT_DIR}\${KEIL_OUTPUT_NAME}.axf" 2> "%%TEMP%%\rasc_stderr.out""
+              disable: false
+          asm-compiler:
+            $use: asm-auto
+            defines: []
+            misc-controls: --via=./via/rasc_armasm.via
+          beforeBuildTasks:
+            - name: cmd /c ""$Prasc_launcher.bat" "$Prasc_version.txt" -nosplash --launcher.suppressErrors --generate --compiler ARMv6 --devicefamily ra "$Pconfiguration.xml" 2> "%%TEMP%%\rasc_stderr.out" && echo. > "$Poutput.rasc""
+              abortAfterFailed: true
+              command: cmd /c ""$Prasc_launcher.bat" "$Prasc_version.txt" -nosplash --launcher.suppressErrors --generate --compiler ARMv6 --devicefamily ra "$Pconfiguration.xml" 2> "%%TEMP%%\rasc_stderr.out" && echo. > "$Poutput.rasc""
+              disable: false
+              stopBuildAfterFailed: true
+          c/cpp-compiler:
+            CXX_FLAGS: "@./via/rasc_armclang.via"
+            C_FLAGS: "@./via/rasc_armclang.via"
+            language-c: c99
+            language-cpp: c++14
+            link-time-optimization: false
+            optimization: level-0
+            warnings: unspecified
+          global:
+            output-debug-info: enable
+            use-microLIB: false
+          linker:
+            $outputTaskExcludes:
+              - .bin
+            misc-controls: --via=./via/rasc_armlink.via
+            output-format: elf
+            ro-base: ""
+            rw-base: ""
+            xo-base: ""
+        scatterFilePath: script/fsp.scat
+        storageLayout:
+          RAM:
+            - id: 1
+              isChecked: false
+              mem:
+                size: "0x0"
+                startAddr: "0x0"
+              noInit: false
+              tag: RAM
+            - id: 2
+              isChecked: false
+              mem:
+                size: "0x0"
+                startAddr: "0x0"
+              noInit: false
+              tag: RAM
+            - id: 3
+              isChecked: false
+              mem:
+                size: "0x0"
+                startAddr: "0x0"
+              noInit: false
+              tag: RAM
+            - id: 1
+              isChecked: true
+              mem:
+                size: "0x80000"
+                startAddr: "0x20000000"
+              noInit: false
+              tag: IRAM
+            - id: 2
+              isChecked: false
+              mem:
+                size: "0x0"
+                startAddr: "0x0"
+              noInit: false
+              tag: IRAM
+          ROM:
+            - id: 1
+              isChecked: false
+              isStartup: false
+              mem:
+                size: "0x0"
+                startAddr: "0x0"
+              tag: ROM
+            - id: 2
+              isChecked: false
+              isStartup: false
+              mem:
+                size: "0x0"
+                startAddr: "0x0"
+              tag: ROM
+            - id: 3
+              isChecked: false
+              isStartup: false
+              mem:
+                size: "0x0"
+                startAddr: "0x0"
+              tag: ROM
+            - id: 1
+              isChecked: true
+              isStartup: true
+              mem:
+                size: "0x180000"
+                startAddr: "0x0"
+              tag: IROM
+            - id: 2
+              isChecked: false
+              isStartup: false
+              mem:
+                size: "0x0"
+                startAddr: "0x0"
+              tag: IROM
+        useCustomScatterFile: true
+    uploadConfigMap:
+      JLink:
+        baseAddr: ""
+        bin: ""
+        cpuInfo:
+          cpuName: "null"
+          vendor: "null"
+        otherCmds: ""
+        proType: 1
+        speed: 8000
+    uploader: JLink

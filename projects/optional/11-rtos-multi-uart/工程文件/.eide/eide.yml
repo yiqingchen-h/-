@@ -1,0 +1,117 @@
+version: "4.1"
+name: stm32_hel__RTOSandUart
+type: ARM
+deviceName: null
+packDir: .pack/Keil/STM32F1xx_DFP.2.2.0
+srcDirs:
+  - HardWare
+  - CMSIS
+  - user
+  - Library
+  - FreeRTOS
+virtualFolder:
+  name: <virtual_root>
+  files: []
+  folders: []
+dependenceList: []
+outDir: build
+miscInfo:
+  uid: dd42510acd491af9a1dcdbe604563b53
+targets:
+  Debug:
+    cppPreprocessAttrs:
+      defineList:
+        - STM32F103xB
+      incList:
+        - HardWare
+        - Library/Inc
+        - CMSIS/Include
+        - .
+        - FreeRTOS/Configuration
+        - FreeRTOS/Device/include
+        - FreeRTOS/Source
+        - FreeRTOS/Device/RVDS/ARM_CM3
+      libList: []
+    excludeList:
+      - CMSIS/Source/startup_stm32f100xb.s
+      - CMSIS/Source/startup_stm32f103x6.s
+      - CMSIS/Source/startup_stm32f102xb.s
+      - CMSIS/Source/startup_stm32f102x6.s
+      - CMSIS/Source/startup_stm32f101xg.s
+      - CMSIS/Source/startup_stm32f101xe.s
+      - CMSIS/Source/startup_stm32f101xb.s
+      - CMSIS/Source/startup_stm32f101x6.s
+      - CMSIS/Source/startup_stm32f100xe.s
+      - CMSIS/Source/startup_stm32f103xe.s
+      - CMSIS/Source/startup_stm32f103xg.s
+      - CMSIS/Source/startup_stm32f105xc.s
+      - CMSIS/Source/startup_stm32f107xc.s
+      - Library/Src/stm32f1xx_hal_timebase_rtc_alarm_template.c
+      - Library/Src/stm32f1xx_hal_timebase_tim_template.c
+      - FreeRTOS/Device/MemMang/heap_1.c
+      - FreeRTOS/Device/MemMang/heap_2.c
+      - FreeRTOS/Device/MemMang/heap_3.c
+      - FreeRTOS/Device/MemMang/heap_5.c
+      - FreeRTOS/Device/RVDS/ARM7_LPC21xx
+      - FreeRTOS/Device/RVDS/ARM_CA9
+      - FreeRTOS/Device/RVDS/ARM_CM0
+      - FreeRTOS/Device/RVDS/ARM_CM4F
+      - FreeRTOS/Device/RVDS/ARM_CM4_MPU
+      - FreeRTOS/Device/RVDS/ARM_CM7
+    toolchain: AC5
+    toolchainConfigMap:
+      AC5:
+        archExtensions: ""
+        cpuType: Cortex-M3
+        floatingPointHardware: none
+        options:
+          version: 4
+          afterBuildTasks: []
+          asm-compiler: {}
+          beforeBuildTasks: []
+          c/cpp-compiler:
+            CXX_FLAGS: --diag_suppress=1 --diag_suppress=1295
+            C_FLAGS: --diag_suppress=1 --diag_suppress=1295
+            c99-mode: true
+            one-elf-section-per-function: true
+            optimization: level-0
+          global:
+            output-debug-info: enable
+            use-microLIB: false
+          linker:
+            output-format: elf
+        scatterFilePath: <YOUR_SCATTER_FILE>.sct
+        storageLayout:
+          RAM:
+            - id: 1
+              isChecked: true
+              mem:
+                size: "0x5000"
+                startAddr: "0x20000000"
+              noInit: false
+              tag: IRAM
+          ROM:
+            - id: 1
+              isChecked: true
+              isStartup: true
+              mem:
+                size: "0x10000"
+                startAddr: "0x08000000"
+              tag: IROM
+        useCustomScatterFile: false
+    uploadConfigMap:
+      JLink:
+        baseAddr: ""
+        bin: ""
+        cpuInfo:
+          cpuName: "null"
+          vendor: "null"
+        otherCmds: ""
+        proType: 1
+        speed: 8000
+      OpenOCD:
+        baseAddr: "0x08000000"
+        bin: ""
+        interface: stlink
+        target: stm32f1x
+    uploader: OpenOCD

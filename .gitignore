@@ -1,0 +1,92 @@
+﻿# OS / editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.tmp
+*.temp
+*.log
+*.bak
+*.orig
+*.swp
+*.swo
+.vscode/
+.idea/
+.claude/
+
+# Backup / cache
+backup/
+Backup/
+.cache/
+.pack/
+
+# Build outputs
+build/
+Build/
+out/
+Debug/
+Release/
+Listings/
+Objects/
+obj/
+bin/
+*.o
+*.obj
+*.d
+*.dep
+*.lst
+*.map
+*.axf
+*.elf
+*.hex
+*.bin
+*.lib
+*.a
+*.so
+*.dll
+*.exe
+
+# Keil / MDK
+*.uvguix.*
+*.uvoptx
+*.uvopt
+*.gpdsc
+*.sbr
+*.plg
+*.htm
+*.html
+*.lnp
+*.crf
+*.scvd
+JLinkLog.txt
+JLinkSettings.JLinkScript
+build_codex.log
+
+# STM32CubeIDE / Eclipse
+.settings/
+.metadata/
+*.launch
+*.ioc.backup
+
+# CCS / TI
+Debug__/
+Release__/
+*.ccsproject.user
+
+# Python
+__pycache__/
+*.pyc
+
+# Archives / generated packages
+*.zip
+*.rar
+*.7z
+*.tar
+*.gz
+
+# Sensitive files
+*.pem
+*.key
+*.crt
+.env
+.env.*
+

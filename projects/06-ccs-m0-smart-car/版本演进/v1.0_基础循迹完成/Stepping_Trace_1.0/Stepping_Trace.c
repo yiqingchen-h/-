@@ -1,0 +1,125 @@
+#include "SYS.h"
+#include "lcd.h"
+#include "lcd_init.h"
+float Measurements = 0;
+float speed = 0;
+unsigned char test_Speed_R = 0;
+unsigned char test_Speed_L = 0;
+int main(void){
+    SYSCFG_DL_init();
+    Uart_0_Init();
+    LCD_Init();//屏幕初始化
+   // LCD_Fill(0,0,LCD_W,LCD_H,BLACK);//清全屏
+    NVIC_EnableIRQ(GPIO_Re_INT_IRQN);         // Re中断
+    NVIC_EnableIRQ(Switch_INT_IRQN);
+    NVIC_EnableIRQ(Trace_Timer_INST_INT_IRQN);      // 开启定时器中断
+    while(1){
+        if(Ping() == 0){
+                LCD_ShowString(0,16*3,"ping_OK",BLACK,WHITE,16,0);
+                break;
+            }
+       }
+    LCD_ShowString(0,16*4,"Kp:",BLACK,WHITE,16,0);
+    LCD_ShowString(0,16*5,"Kd:",BLACK,WHITE,16,0);
+    LCD_ShowString(0,16*6,"Measurements:",BLACK,WHITE,16,0);
+    LCD_ShowString(0,16*7,"Pid_speed:",BLACK,WHITE,16,0);
+    LCD_ShowString(0,16*8,"Speed_L:",BLACK,WHITE,16,0);
+    LCD_ShowString(8*15,16*8,"Speed_R:",BLACK,WHITE,16,0);
+    LCD_ShowString(0,16*9,"Black_fast_flag:",BLACK,WHITE,16,0);
+    steering_Pid.steering_Kp = 9.8; // 8 细分 Kp = 11.5    16细分 kp = 12.8
+    steering_Pid.steering_Kd = -4.6;   // 8 细分 Kd = -2.7      16细分 kd = -5.6
+    Stepper_Subdivision_Init(subdivision_16);  // 在串口模式下用以配置地址
+    // Stepper_Uart_Init_R(0);
+    // Stepper_Uart_Subdivision_R(8);            // 8细分时最大值3000 最小值   
+    float Re = 0;
+    unsigned char Key = 0;
+    unsigned char Pid_mode = 0;
+    while(1)
+    {
+        Re = Get_Re();
+        Key = Get_switch();
+        switch(Key)
+        {
+            case 1:
+                Pid_mode ++;
+                Pid_mode = Pid_mode > 2 ? 1 :Pid_mode;
+                break;
+            case 2:
+                DL_TimerG_startCounter(Trace_Timer_INST);   // 启动定时器
+                break;
+            case 3:
+                //Stepper_Uart_control_R(test_speed);
+                DL_TimerG_stopCounter(Trace_Timer_INST);   // 关闭定时器
+                Stepper_Stop();
+                break;
+            default:
+                break;
+        }
+        switch (Pid_mode)
+        {
+            case 1:
+                steering_Pid.steering_Kp += Re/10;
+                LCD_ShowString(0,16*3,"current _Kp",BLACK,WHITE,16,0);
+                break;
+            case 2:
+                steering_Pid.steering_Kd += Re/10;
+                LCD_ShowString(0,16*3,"current _Kd",BLACK,WHITE,16,0);
+                break;
+            default:
+                LCD_ShowString(0,16*3,"current _NO",BLACK,WHITE,16,0);
+                break;
+        }
+        LCD_ShowFloatNum1(8*3,16*4,steering_Pid.steering_Kp,4,BLACK,WHITE,16);
+        LCD_ShowFloatNum1(8*3,16*5,steering_Pid.steering_Kd,4,BLACK,WHITE,16);
+        LCD_ShowFloatNum1(8*13,16*6,Measurements,4,BLACK,WHITE,16);
+        LCD_ShowFloatNum1(8*10,16*7,speed,4,BLACK,WHITE,16);
+        LCD_ShowIntNum(8*9,16*8,test_Speed_R,3,BLACK,WHITE,16);
+        LCD_ShowIntNum(8*24,16*8,test_Speed_L,3,BLACK,WHITE,16);
+        LCD_ShowIntNum(8*17,16*9,Black_fast_flag,3,BLACK,WHITE,16);
+
+    }
+}
+
+void Trace_Timer_INST_IRQHandler(void)
+{
+    switch (DL_TimerG_getPendingInterrupt(Trace_Timer_INST)) {  // 获取触发中断原因和判断优先级
+        case DL_TIMER_IIDX_ZERO:   // 0 触发中断  -- 计数器值为0时触发
+            Measurements = Read_Grayscale();
+            if(Measurements == 0xE){                        // 结束停止
+                Stepper_Stop();
+                DL_TimerG_stopCounter(Trace_Timer_INST);   // 关闭定时器
+                break;
+            }
+            printf("Measurements:%f\t\n",Measurements);
+            if (Measurements == 0xFF || Measurements == 0xF)break;
+            //---------------------------------------           //左转
+            if(Measurements == 0x0A){       //左转标志位
+            stepping_R(0,subdivision_16,70);
+            stepping_L(1,subdivision_16,0);
+            test_Speed_R = 70;
+            test_Speed_L = 0;
+            //stepping_L(1,subdivision_8,0);
+            break;
+            }
+            if(Measurements == 0x0B){       //右转标志位
+            stepping_R(1,subdivision_16,10);
+            stepping_L(1,subdivision_16,70);
+            test_Speed_R = -10;
+            test_Speed_L = 70;
+            //stepping_L(1,subdivision_8,0);
+            break;
+            }
+            //-----------------------------------------         //正常循迹
+            speed = Grayscale_Pid(0,Measurements);  // 右偏返回正数
+            unsigned char speed_R = 100 + speed;
+            unsigned char speed_L = 100 - speed;
+            stepping_R(0,subdivision_16,speed_R);
+            stepping_L(1,subdivision_16,speed_L);
+            test_Speed_R = 100 + speed;
+            test_Speed_L = 100 - speed;
+            break;
+            //-----------------------------------------
+        default:
+            break;
+    }
+}
