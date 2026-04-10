@@ -1,19 +1,5 @@
 #!/usr/bin/env python3
-"""
-标定参数求解脚本
 
-用途：
-1. 平面模式：根据采点 CSV 拟合二维仿射参数 A11~A23。
-2. 3D 模式：根据采点 CSV 和相机内参，把 (u, v, depth) 转成相机坐标，
-   再拟合相机坐标系到机械臂基座坐标系的刚体变换 R_cb / t_cb。
-
-输出：
-1. 直接打印可粘贴到 Calibration.h 的宏定义。
-2. 打印拟合误差，便于判断这组采点是否可用。
-
-依赖：
-pip install numpy
-"""
 
 from __future__ import annotations
 
@@ -48,7 +34,7 @@ def rms(errors: np.ndarray) -> float:
 
 def solve_plane(rows: list[dict[str, float]]) -> None:
     if len(rows) < 3:
-        raise ValueError("平面标定至少需要 3 个点，实际建议 10 个以上。")
+        raise ValueError("平面标定至少需要 3 个点。")
 
     uv = np.array([[r["u"], r["v"], 1.0] for r in rows], dtype=np.float64)
     xb = np.array([r["x_base"] for r in rows], dtype=np.float64)
@@ -85,7 +71,7 @@ def image_to_camera(rows: list[dict[str, float]], fx: float, fy: float, cx: floa
 
 def solve_rigid_transform(pc: np.ndarray, pb: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     if pc.shape[0] < 3:
-        raise ValueError("3D 标定至少需要 3 个点，实际建议 12 个以上。")
+        raise ValueError("3D 标定至少需要 3 个点。")
 
     pc_mean = np.mean(pc, axis=0)
     pb_mean = np.mean(pb, axis=0)
@@ -107,7 +93,7 @@ def solve_rigid_transform(pc: np.ndarray, pb: np.ndarray) -> tuple[np.ndarray, n
 
 def solve_3d(rows: list[dict[str, float]], fx: float, fy: float, cx: float, cy: float, depth_scale: float) -> None:
     if len(rows) < 3:
-        raise ValueError("3D 标定至少需要 3 个点，实际建议 12 个以上。")
+        raise ValueError("3D 标定至少需要 3 个点。")
 
     pc = image_to_camera(rows, fx, fy, cx, cy, depth_scale)
     pb = np.array([[r["x_base"], r["y_base"], r["z_base"]] for r in rows], dtype=np.float64)
