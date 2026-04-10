@@ -33,4 +33,3 @@
 ## 联系方式
 - Email：wdhyqc_2910 [at] 163.com
 - Phone：157****5490
-- GitHub：请替换为你的公开主页链接
